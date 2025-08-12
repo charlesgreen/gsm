@@ -28,5 +28,26 @@ go.work.sum
 .env
 
 # Editor/IDE
-# .idea/
-# .vscode/
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+/bin/
+/dist/
+
+# Log files
+*.log
+
+# Storage files
+storage.json
+secrets.json
+
+# Environment files
+.env.local

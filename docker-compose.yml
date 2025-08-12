@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  secret-manager-emulator:
+    build: .
+    ports:
+      - "8085:8085"
+    environment:
+      - GSM_PORT=8085
+      - GSM_HOST=0.0.0.0
+      - GSM_LOG_LEVEL=info
+      - GSM_ENABLE_CORS=true
+      - GSM_STORAGE_FILE=/app/data/secrets.json
+    volumes:
+      - ./data:/app/data
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8085/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    restart: unless-stopped
+    networks:
+      - gsm-network
+
+networks:
+  gsm-network:
+    driver: bridge
+
+volumes:
+  gsm-data:
