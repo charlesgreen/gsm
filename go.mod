@@ -2,8 +2,6 @@ module github.com/charlesgreen/gsm
 
 go 1.23.0
 
-toolchain go1.24.5
-
 require (
 	cloud.google.com/go/secretmanager v1.15.0
 	google.golang.org/api v0.246.0
