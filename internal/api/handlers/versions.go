@@ -44,7 +44,8 @@ func (h *VersionsHandler) AddSecretVersion(w http.ResponseWriter, r *http.Reques
 	version, err := h.storage.AddSecretVersion(r.Context(), projectID, secretID, req.Payload.Data)
 	if err != nil {
 		if err == storage.ErrSecretNotFound {
-			writeErrorResponse(w, http.StatusNotFound, "Secret not found", "NOT_FOUND")
+			message := models.FormatResourceNotFoundError("secret", projectID, secretID)
+			writeErrorResponse(w, http.StatusNotFound, message, "NOT_FOUND")
 			return
 		}
 		writeErrorResponse(w, http.StatusInternalServerError, "Failed to add secret version", "INTERNAL")
@@ -67,11 +68,13 @@ func (h *VersionsHandler) AccessSecretVersion(w http.ResponseWriter, r *http.Req
 	data, err := h.storage.AccessSecretVersion(r.Context(), projectID, secretID, versionID)
 	if err != nil {
 		if err == storage.ErrSecretNotFound {
-			writeErrorResponse(w, http.StatusNotFound, "Secret not found", "NOT_FOUND")
+			message := models.FormatResourceNotFoundError("secret", projectID, secretID)
+			writeErrorResponse(w, http.StatusNotFound, message, "NOT_FOUND")
 			return
 		}
 		if err == storage.ErrVersionNotFound {
-			writeErrorResponse(w, http.StatusNotFound, "Version not found", "NOT_FOUND")
+			message := models.FormatResourceNotFoundError("version", projectID, secretID+"/"+versionID)
+			writeErrorResponse(w, http.StatusNotFound, message, "NOT_FOUND")
 			return
 		}
 		writeErrorResponse(w, http.StatusInternalServerError, "Failed to access secret version", "INTERNAL")
@@ -116,7 +119,8 @@ func (h *VersionsHandler) ListSecretVersions(w http.ResponseWriter, r *http.Requ
 	versions, nextPageToken, err := h.storage.ListSecretVersions(r.Context(), projectID, secretID, pageSize, pageToken)
 	if err != nil {
 		if err == storage.ErrSecretNotFound {
-			writeErrorResponse(w, http.StatusNotFound, "Secret not found", "NOT_FOUND")
+			message := models.FormatResourceNotFoundError("secret", projectID, secretID)
+			writeErrorResponse(w, http.StatusNotFound, message, "NOT_FOUND")
 			return
 		}
 		writeErrorResponse(w, http.StatusInternalServerError, "Failed to list secret versions", "INTERNAL")
@@ -143,11 +147,13 @@ func (h *VersionsHandler) DeleteSecretVersion(w http.ResponseWriter, r *http.Req
 
 	if err := h.storage.DeleteSecretVersion(r.Context(), projectID, secretID, versionID); err != nil {
 		if err == storage.ErrSecretNotFound {
-			writeErrorResponse(w, http.StatusNotFound, "Secret not found", "NOT_FOUND")
+			message := models.FormatResourceNotFoundError("secret", projectID, secretID)
+			writeErrorResponse(w, http.StatusNotFound, message, "NOT_FOUND")
 			return
 		}
 		if err == storage.ErrVersionNotFound {
-			writeErrorResponse(w, http.StatusNotFound, "Version not found", "NOT_FOUND")
+			message := models.FormatResourceNotFoundError("version", projectID, secretID+"/"+versionID)
+			writeErrorResponse(w, http.StatusNotFound, message, "NOT_FOUND")
 			return
 		}
 		writeErrorResponse(w, http.StatusInternalServerError, "Failed to delete secret version", "INTERNAL")

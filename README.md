@@ -5,6 +5,7 @@ A production-ready HTTP server that emulates the Google Secret Manager API for l
 ## Features
 
 - **Complete API Coverage**: Full implementation of Google Secret Manager REST API
+- **Production Parity**: Exact error response formats and HTTP status codes matching Google Cloud
 - **Local Development**: Run entirely offline with no Google Cloud dependencies
 - **Persistent Storage**: Optional JSON file persistence for data across restarts
 - **Docker Support**: Production-ready container with health checks
@@ -107,6 +108,73 @@ curl -X POST http://localhost:8085/v1/projects/my-project/secrets/my-secret:addV
 ```bash
 curl http://localhost:8085/v1/projects/my-project/secrets/my-secret/versions/latest:access
 ```
+
+## Production Parity
+
+This emulator is designed to provide **exact production parity** with Google Cloud Secret Manager, ensuring that applications behave identically in development and production environments.
+
+### Error Response Format
+
+All error responses match the exact Google Cloud API error format:
+
+```json
+{
+  "error": {
+    "code": 404,
+    "message": "Secret [projects/my-project/secrets/my-secret] not found.",
+    "status": "NOT_FOUND"
+  }
+}
+```
+
+### HTTP Status Code Compliance
+
+The emulator returns the same HTTP status codes as production:
+
+- **200 OK**: Successful GET requests
+- **201 Created**: Successful resource creation
+- **204 No Content**: Successful DELETE requests
+- **400 Bad Request (INVALID_ARGUMENT)**: Invalid request format or missing required fields
+- **404 Not Found (NOT_FOUND)**: Resource doesn't exist
+- **409 Conflict (ALREADY_EXISTS)**: Attempting to create existing resource
+- **500 Internal Server Error (INTERNAL)**: Server-side processing errors
+
+### Resource Name Formatting
+
+Error messages include complete resource paths matching Google Cloud conventions:
+
+- Secrets: `projects/{project}/secrets/{secret}`
+- Versions: `projects/{project}/secrets/{secret}/versions/{version}`
+
+### Testing Production Parity
+
+Run the included validation script to verify production parity:
+
+```bash
+# Start the emulator
+go run cmd/server/main.go &
+
+# Run parity validation tests
+./scripts/validate_parity.sh
+
+# Or run the Go test suite
+go test ./tests/integration/production_parity_test.go -v
+```
+
+The parity tests validate:
+
+- ✅ Correct HTTP status codes for all scenarios
+- ✅ Proper JSON error response structure
+- ✅ Resource-specific error messages with full paths
+- ✅ Consistent error handling across all endpoints
+- ✅ Transaction rollback behavior matching production
+
+### Benefits of Production Parity
+
+1. **Reliable Testing**: Local tests accurately predict production behavior
+2. **Debugging Consistency**: Same error responses help identify issues early
+3. **Reduced Risk**: Eliminates deployment surprises from behavioral differences
+4. **Seamless Integration**: Drop-in replacement for production GSM during development
 
 ## Configuration
 
@@ -226,11 +294,17 @@ go test ./tests/unit/...
 # Run integration tests
 go test ./tests/integration/...
 
+# Run production parity tests
+go test ./tests/integration/production_parity_test.go -v
+
 # Run all tests
 go test ./...
 
 # Run with coverage
 go test -cover ./...
+
+# Validate production parity with shell script
+./scripts/validate_parity.sh
 ```
 
 ### Code Quality

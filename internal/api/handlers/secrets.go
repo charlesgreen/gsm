@@ -48,7 +48,8 @@ func (h *SecretsHandler) CreateSecret(w http.ResponseWriter, r *http.Request) {
 
 	if err := h.storage.CreateSecret(r.Context(), projectID, req.SecretID, secret); err != nil {
 		if err == storage.ErrSecretExists {
-			writeErrorResponse(w, http.StatusConflict, "Secret already exists", "ALREADY_EXISTS")
+			message := models.FormatResourceExistsError("secret", projectID, req.SecretID)
+			writeErrorResponse(w, http.StatusConflict, message, "ALREADY_EXISTS")
 			return
 		}
 		writeErrorResponse(w, http.StatusInternalServerError, "Failed to create secret", "INTERNAL")
@@ -71,7 +72,8 @@ func (h *SecretsHandler) GetSecret(w http.ResponseWriter, r *http.Request) {
 	secret, err := h.storage.GetSecret(r.Context(), projectID, secretID)
 	if err != nil {
 		if err == storage.ErrSecretNotFound {
-			writeErrorResponse(w, http.StatusNotFound, "Secret not found", "NOT_FOUND")
+			message := models.FormatResourceNotFoundError("secret", projectID, secretID)
+			writeErrorResponse(w, http.StatusNotFound, message, "NOT_FOUND")
 			return
 		}
 		writeErrorResponse(w, http.StatusInternalServerError, "Failed to get secret", "INTERNAL")
@@ -125,7 +127,8 @@ func (h *SecretsHandler) DeleteSecret(w http.ResponseWriter, r *http.Request) {
 
 	if err := h.storage.DeleteSecret(r.Context(), projectID, secretID); err != nil {
 		if err == storage.ErrSecretNotFound {
-			writeErrorResponse(w, http.StatusNotFound, "Secret not found", "NOT_FOUND")
+			message := models.FormatResourceNotFoundError("secret", projectID, secretID)
+			writeErrorResponse(w, http.StatusNotFound, message, "NOT_FOUND")
 			return
 		}
 		writeErrorResponse(w, http.StatusInternalServerError, "Failed to delete secret", "INTERNAL")
@@ -187,3 +190,4 @@ func writeErrorResponse(w http.ResponseWriter, statusCode int, message, status s
 	errorResp := models.NewErrorResponse(statusCode, message, status)
 	_ = json.NewEncoder(w).Encode(errorResp)
 }
+
