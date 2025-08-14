@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] - 2025-08-14
+
+### Fixed
+- GitHub Actions CI workflow issues for more reliable continuous integration
+- Release workflow automation for smoother deployment process
+- golangci-lint configuration for v1.x compatibility by removing version field
+
+### Added
+- Comprehensive Makefile with standard build, test, and development targets
+- Enhanced CI/CD pipeline with proper workflow debugging
+
+### Changed
+- Improved GitHub Actions configuration for better build stability
+- Streamlined release process with fixed automation workflows
+
+### Developer Experience
+- Added Makefile targets for common development tasks
+- Better linting compatibility across different golangci-lint versions
+- More robust CI pipeline with proper error handling
+
 ## [1.0.0] - 2025-08-14
 
 ### Initial Release
