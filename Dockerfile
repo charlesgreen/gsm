@@ -1,5 +1,9 @@
 FROM golang:1.23-alpine AS builder
 
+# Accept build arguments for target platform
+ARG TARGETOS
+ARG TARGETARCH
+
 WORKDIR /app
 
 RUN apk add --no-cache git ca-certificates
@@ -9,7 +13,8 @@ RUN go mod download
 
 COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o gsm-server ./cmd/server
+# Build for the target platform using the build arguments
+RUN CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -a -installsuffix cgo -o gsm-server ./cmd/server
 
 FROM alpine:latest
 
