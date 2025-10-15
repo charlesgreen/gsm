@@ -7,6 +7,12 @@ import (
 	"strings"
 )
 
+var skipNormalizationFor = map[string]struct{}{
+	"labels":         {},
+	"annotations":    {},
+	"versionAliases": {},
+}
+
 // decodeJSON into dst from the reader, normalizing snake_case keys to camelCase
 //
 // This exists because the GSM SDK in Go uses snake_case JSON struct tags, while
@@ -30,19 +36,22 @@ func normalizeKeys(src map[string]any) map[string]any {
 	dst := make(map[string]any, len(src))
 	for k, v := range src {
 		camelCase := toCamelCase(k)
+		if _, ok := skipNormalizationFor[camelCase]; ok {
+			dst[camelCase] = v
+		}
 
 		// Decide whether we need to run recursively for other objects or arrays of
 		// objects
-		switch cast := v.(type) {
+		switch vv := v.(type) {
 		case map[string]any:
-			v = normalizeKeys(cast)
+			v = normalizeKeys(vv)
 		case []any:
-			for i, inner := range cast {
+			for i, inner := range vv {
 				if m, ok := inner.(map[string]any); ok {
-					cast[i] = normalizeKeys(m)
+					vv[i] = normalizeKeys(m)
 				}
 			}
-			v = cast
+			v = vv
 		}
 		dst[camelCase] = v
 	}
@@ -51,12 +60,15 @@ func normalizeKeys(src map[string]any) map[string]any {
 
 func toCamelCase(s string) string {
 	parts := strings.Split(s, "_")
-	if len(parts) == 1 {
+	if len(parts) < 2 {
 		return s
 	}
 
 	camelCase := parts[0]
 	for _, p := range parts[1:] {
+		if len(p) == 0 {
+			continue
+		}
 		camelCase += strings.ToUpper(p[:1]) + p[1:]
 	}
 	return camelCase

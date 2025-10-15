@@ -264,7 +264,7 @@ func TestTCP(t *testing.T) {
 func TestMem(t *testing.T) {
     // Uses local buffer instead of network sockets. Enables use with new packages like
     // testing/synctest
-	gsm, err := gsmtest.New(t, gmtest.InMemory())
+	gsm, err := gsmtest.New(t, gsmtest.InMemory())
 	if err != nil {
 		t.Fatal(err)
 	}

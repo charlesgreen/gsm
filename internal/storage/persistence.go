@@ -35,9 +35,6 @@ func NewPersistentStorage(filePath string) (*PersistentStorage, error) {
 
 // Load reads and restores secrets from the persistent storage file.
 func (p *PersistentStorage) Load() error {
-	p.mu.Lock()
-	defer p.mu.Unlock()
-
 	if _, err := os.Stat(p.filePath); os.IsNotExist(err) {
 		return nil
 	}
@@ -52,7 +49,9 @@ func (p *PersistentStorage) Load() error {
 		return fmt.Errorf("failed to parse storage file: %w", err)
 	}
 
+	p.MemoryStorage.mu.Lock()
 	p.secrets = storageData.Secrets
+	p.MemoryStorage.mu.Unlock()
 	return nil
 }
 
@@ -103,13 +102,13 @@ func (p *PersistentStorage) AddSecretVersion(ctx context.Context, projectID, sec
 	}
 
 	if err := p.Save(); err != nil {
-		p.mu.Lock()
+		p.MemoryStorage.mu.Lock()
 		key := fmt.Sprintf("%s/%s", projectID, secretID)
 		if secret, exists := p.secrets[key]; exists {
 			delete(secret.Versions, version.GetVersionID())
 			secret.VersionCount--
 		}
-		p.mu.Unlock()
+		p.MemoryStorage.mu.Unlock()
 		return nil, err
 	}
 
@@ -128,4 +127,3 @@ func (p *PersistentStorage) DeleteSecretVersion(ctx context.Context, projectID, 
 func (p *PersistentStorage) Close() error {
 	return p.Save()
 }
-

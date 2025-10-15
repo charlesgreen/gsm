@@ -3,6 +3,8 @@ package handlers
 import (
 	"cmp"
 	"encoding/json"
+	"errors"
+	"io"
 	"net/http"
 	"strconv"
 	"strings"
@@ -32,7 +34,7 @@ func (h *SecretsHandler) CreateSecret(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var req models.CreateSecretRequest
-	if err := decodeJSON(r.Body, &req); err != nil {
+	if err := decodeJSON(r.Body, &req); err != nil && !errors.Is(err, io.EOF) {
 		writeErrorResponse(w, http.StatusBadRequest, "Invalid request body", "INVALID_ARGUMENT")
 		return
 	}
