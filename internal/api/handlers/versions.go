@@ -31,7 +31,7 @@ func (h *VersionsHandler) AddSecretVersion(w http.ResponseWriter, r *http.Reques
 	}
 
 	var req models.AddSecretVersionRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+	if err := decodeJSON(r.Body, &req); err != nil {
 		writeErrorResponse(w, http.StatusBadRequest, "Invalid request body", "INVALID_ARGUMENT")
 		return
 	}
@@ -172,3 +172,4 @@ func extractProjectSecretAndVersionFromAccessPath(path string) (string, string, 
 	path = strings.TrimSuffix(path, ":access")
 	return extractProjectSecretAndVersionID(path)
 }
+

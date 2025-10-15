@@ -51,7 +51,7 @@ func ExampleUsage() {
 func newSecretManagerClient(ctx context.Context) (*secretmanager.Client, error) {
 	if emulatorHost := os.Getenv("SECRET_MANAGER_EMULATOR_HOST"); emulatorHost != "" {
 		fmt.Printf("Using Secret Manager Emulator at: %s\n", emulatorHost)
-		return secretmanager.NewClient(ctx,
+		return secretmanager.NewRESTClient(ctx,
 			option.WithEndpoint("http://"+emulatorHost),
 			option.WithoutAuthentication(),
 		)
@@ -200,7 +200,7 @@ func SimpleExample() {
 	
 	_ = os.Setenv("SECRET_MANAGER_EMULATOR_HOST", "localhost:8085")
 	
-	client, err := secretmanager.NewClient(ctx,
+	client, err := secretmanager.NewRESTClient(ctx,
 		option.WithEndpoint("http://localhost:8085"),
 		option.WithoutAuthentication(),
 	)
@@ -255,7 +255,7 @@ func Base64Example() {
 	ctx := context.Background()
 	_ = os.Setenv("SECRET_MANAGER_EMULATOR_HOST", "localhost:8085")
 	
-	client, err := secretmanager.NewClient(ctx,
+	client, err := secretmanager.NewRESTClient(ctx,
 		option.WithEndpoint("http://localhost:8085"),
 		option.WithoutAuthentication(),
 	)

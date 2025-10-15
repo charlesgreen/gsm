@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"cmp"
 	"encoding/json"
 	"net/http"
 	"strconv"
@@ -31,16 +32,18 @@ func (h *SecretsHandler) CreateSecret(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var req models.CreateSecretRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+	if err := decodeJSON(r.Body, &req); err != nil {
 		writeErrorResponse(w, http.StatusBadRequest, "Invalid request body", "INVALID_ARGUMENT")
 		return
 	}
 
+	req.SecretID = cmp.Or(req.SecretID, r.FormValue("secretId"))
 	if req.SecretID == "" {
 		writeErrorResponse(w, http.StatusBadRequest, "secretId is required", "INVALID_ARGUMENT")
 		return
 	}
 
+	req.Secret = cmp.Or(req.Secret, new(models.CreateSecretData))
 	secret := models.NewSecret(projectID, req.SecretID, req.Secret.Labels)
 	if req.Secret.Replication != nil {
 		secret.Replication = *req.Secret.Replication
@@ -118,6 +121,8 @@ func (h *SecretsHandler) ListSecrets(w http.ResponseWriter, r *http.Request) {
 }
 
 // DeleteSecret handles DELETE requests to remove a secret.
+//
+// TODO: Support ?etag
 func (h *SecretsHandler) DeleteSecret(w http.ResponseWriter, r *http.Request) {
 	projectID, secretID := extractProjectAndSecretID(r.URL.Path)
 	if projectID == "" || secretID == "" {
@@ -151,7 +156,7 @@ func extractProjectID(path string) string {
 func extractProjectAndSecretID(path string) (string, string) {
 	parts := strings.Split(strings.Trim(path, "/"), "/")
 	var projectID, secretID string
-	
+
 	for i, part := range parts {
 		if part == "projects" && i+1 < len(parts) {
 			projectID = parts[i+1]
@@ -160,14 +165,14 @@ func extractProjectAndSecretID(path string) (string, string) {
 			secretID = parts[i+1]
 		}
 	}
-	
+
 	return projectID, secretID
 }
 
 func extractProjectSecretAndVersionID(path string) (string, string, string) {
 	parts := strings.Split(strings.Trim(path, "/"), "/")
 	var projectID, secretID, versionID string
-	
+
 	for i, part := range parts {
 		if part == "projects" && i+1 < len(parts) {
 			projectID = parts[i+1]
@@ -179,15 +184,14 @@ func extractProjectSecretAndVersionID(path string) (string, string, string) {
 			versionID = parts[i+1]
 		}
 	}
-	
+
 	return projectID, secretID, versionID
 }
 
 func writeErrorResponse(w http.ResponseWriter, statusCode int, message, status string) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
-	
+
 	errorResp := models.NewErrorResponse(statusCode, message, status)
 	_ = json.NewEncoder(w).Encode(errorResp)
 }
-

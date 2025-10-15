@@ -4,6 +4,7 @@ go 1.23.0
 
 require (
 	cloud.google.com/go/secretmanager v1.15.0
+	github.com/akutz/memconn v0.1.0
 	google.golang.org/api v0.246.0
 )
 
