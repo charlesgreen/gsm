@@ -29,32 +29,35 @@ func decodeJSON[T any](r io.Reader, dst *T) error {
 func normalizeKeys(src map[string]any) map[string]any {
 	dst := make(map[string]any, len(src))
 	for k, v := range src {
-		parts := strings.Split(k, "_")
-		if len(parts) == 0 {
-			continue
-		}
+		camelCase := toCamelCase(k)
 
-		var camelCase string
-		for i, p := range parts {
-			if i == 0 {
-				camelCase = p
-				continue
-			}
-			camelCase += strings.ToUpper(p[:1]) + p[1:]
-		}
-
-		switch vv := v.(type) {
+		// Decide whether we need to run recursively for other objects or arrays of
+		// objects
+		switch cast := v.(type) {
 		case map[string]any:
-			v = normalizeKeys(vv)
+			v = normalizeKeys(cast)
 		case []any:
-			for i, inner := range vv {
+			for i, inner := range cast {
 				if m, ok := inner.(map[string]any); ok {
-					vv[i] = normalizeKeys(m)
+					cast[i] = normalizeKeys(m)
 				}
 			}
-			v = vv
+			v = cast
 		}
 		dst[camelCase] = v
 	}
 	return dst
+}
+
+func toCamelCase(s string) string {
+	parts := strings.Split(s, "_")
+	if len(parts) == 1 {
+		return s
+	}
+
+	camelCase := parts[0]
+	for _, p := range parts[1:] {
+		camelCase += strings.ToUpper(p[:1]) + p[1:]
+	}
+	return camelCase
 }
