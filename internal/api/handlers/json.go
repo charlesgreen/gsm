@@ -66,7 +66,7 @@ func toCamelCase(s string) string {
 	}
 
 	var camelCase string
-	for _, p := range parts[1:] {
+	for _, p := range parts {
 		if len(p) == 0 {
 			continue
 		}
