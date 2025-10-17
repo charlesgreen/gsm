@@ -38,6 +38,7 @@ func normalizeKeys(src map[string]any) map[string]any {
 		camelCase := toCamelCase(k)
 		if _, ok := skipNormalizationFor[camelCase]; ok {
 			dst[camelCase] = v
+			continue
 		}
 
 		// Decide whether we need to run recursively for other objects or arrays of
@@ -64,12 +65,18 @@ func toCamelCase(s string) string {
 		return s
 	}
 
-	camelCase := parts[0]
+	var camelCase string
 	for _, p := range parts[1:] {
 		if len(p) == 0 {
 			continue
 		}
-		camelCase += strings.ToUpper(p[:1]) + p[1:]
+
+		// The first segment written should stay naturally cased
+		if camelCase == "" {
+			camelCase += p
+		} else {
+			camelCase += strings.ToUpper(p[:1]) + p[1:]
+		}
 	}
 	return camelCase
 }
