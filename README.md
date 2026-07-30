@@ -210,7 +210,7 @@ func main() {
     ctx := context.Background()
     
     // Use emulator endpoint
-    client, err := secretmanager.NewClient(ctx, 
+    client, err := secretmanager.NewRESTClient(ctx, 
         option.WithEndpoint("http://localhost:8085"),
         option.WithoutAuthentication(),
     )
@@ -227,9 +227,11 @@ func main() {
 ### Environment-Based Configuration
 
 ```go
+import "os"
+
 func newSecretManagerClient(ctx context.Context) (*secretmanager.Client, error) {
     if emulatorHost := os.Getenv("SECRET_MANAGER_EMULATOR_HOST"); emulatorHost != "" {
-        return secretmanager.NewClient(ctx,
+        return secretmanager.NewRESTClient(ctx,
             option.WithEndpoint("http://"+emulatorHost),
             option.WithoutAuthentication(),
         )
@@ -238,6 +240,39 @@ func newSecretManagerClient(ctx context.Context) (*secretmanager.Client, error) 
     // Production: use default authentication
     return secretmanager.NewClient(ctx)
 }
+```
+
+### Testing Configuration
+
+```go
+func TestTCP(t *testing.T) {
+    gsm, err := gsmtest.New(t)
+    if err != nil {
+        t.Fatal(err)
+    }
+
+    ctx, cancel := context.WithCancel(context.Background())
+    defer cancel()
+    go gsm.Start(ctx)
+
+    client, err := gsm.Client(ctx)
+    if err != nil {
+        t.Fatal(err)
+    }
+    defer client.Close()
+    // Use normally
+}
+
+func TestMem(t *testing.T) {
+    // Uses local buffer instead of network sockets. Enables use with new packages like
+    // testing/synctest
+    gsm, err := gsmtest.New(t, gsmtest.InMemory())
+    if err != nil {
+        t.Fatal(err)
+    }
+    // Same as other test
+}
+
 ```
 
 ## Integration with Firebase Emulators
