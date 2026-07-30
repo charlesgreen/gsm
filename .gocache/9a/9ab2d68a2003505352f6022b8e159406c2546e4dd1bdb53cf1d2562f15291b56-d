@@ -1,7 +1,0 @@
-./auxiliary.go
-./auxiliary_go123.go
-./doc.go
-./helpers.go
-./iam.go
-./secret_manager_client.go
-./version.go
