@@ -172,4 +172,3 @@ func extractProjectSecretAndVersionFromAccessPath(path string) (string, string, 
 	path = strings.TrimSuffix(path, ":access")
 	return extractProjectSecretAndVersionID(path)
 }
-

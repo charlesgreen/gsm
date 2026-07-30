@@ -1,13 +1,19 @@
+version: "2"
+
 linters:
   enable:
+    - asasalint
     - errcheck
+    - errname
+    - gocritic
     - govet
     - ineffassign
+    - prealloc
+    - revive
     - staticcheck
     - unused
-    - revive
-    - gocritic
-    - errname
-    - asasalint
-    - prealloc
     - whitespace
+
+formatters:
+  enable:
+    - gofmt

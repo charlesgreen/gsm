@@ -160,7 +160,7 @@ func generateEtag() string {
 func generateChecksum(data []byte) *SecretVersionChecksum {
 	crc32Hash := crc32.ChecksumIEEE(data)
 	sha256Hash := sha256.Sum256(data)
-	
+
 	return &SecretVersionChecksum{
 		Crc32c: fmt.Sprintf("%08x", crc32Hash),
 		Sha256: fmt.Sprintf("%x", sha256Hash),
