@@ -1,3 +1,7 @@
+// Package gsmtest provides an in-process Google Secret Manager emulator for Go
+// tests, as a parallel to the bttest and pstest harnesses Google ships. It runs
+// the emulator over TCP, an in-memory pipe, or persistent storage, and hands back
+// a Secret Manager client wired to it.
 package gsmtest
 
 import (
@@ -19,6 +23,7 @@ import (
 	"google.golang.org/api/option"
 )
 
+// Option configures the emulator created by New.
 type Option func(*options)
 
 // StorageFile enables persistent secret storage using a file path
@@ -91,6 +96,8 @@ func New(t testing.TB, opts ...Option) (*SecretManager, error) {
 	}, nil
 }
 
+// SecretManager is a running emulator instance and the handle tests use to start
+// it and obtain a client.
 type SecretManager struct {
 	tb              testing.TB
 	srv             *http.Server

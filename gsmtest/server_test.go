@@ -47,13 +47,13 @@ func TestPersistent(t *testing.T) {
 func testFlow(t testing.TB, gsm *gsmtest.SecretManager) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	go gsm.Start(ctx)
+	go func() { _ = gsm.Start(ctx) }()
 
 	client, err := gsm.Client(ctx)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer client.Close()
+	defer func() { _ = client.Close() }()
 
 	// Create an initial secret
 	secret, err := client.CreateSecret(ctx, &secretmanagerpb.CreateSecretRequest{
