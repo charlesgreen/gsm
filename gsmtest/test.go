@@ -7,12 +7,12 @@ package gsmtest
 import (
 	"cmp"
 	"context"
+	"crypto/rand"
+	"encoding/hex"
 	"errors"
 	"fmt"
-	"math/rand"
 	"net"
 	"net/http"
-	"strconv"
 	"testing"
 	"time"
 
@@ -86,7 +86,10 @@ func New(t testing.TB, opts ...Option) (*SecretManager, error) {
 		return nil, fmt.Errorf("creating store: %w", err)
 	}
 
-	srv := &http.Server{Handler: routes.SetupRoutes(store)}
+	srv := &http.Server{
+		Handler:           routes.SetupRoutes(store),
+		ReadHeaderTimeout: 10 * time.Second,
+	}
 	return &SecretManager{
 		tb:              t,
 		srv:             srv,
@@ -117,8 +120,9 @@ func (s *SecretManager) Start(ctx context.Context) error {
 		// Unblock exiting the parent func when requests have drained
 		defer close(done)
 
-		// Perhaps overkill, but avoid hanging someone's test indefinitely.
-		timeCtx, cancel := context.WithTimeout(context.Background(), s.shutdownTimeout)
+		// Perhaps overkill, but avoid hanging someone's test indefinitely. The parent
+		// context is already canceled by this point, so detach from its cancellation.
+		timeCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), s.shutdownTimeout)
 		defer cancel()
 
 		if err := s.srv.Shutdown(timeCtx); err != nil {
@@ -187,7 +191,11 @@ func (o options) createListener() (net.Listener, error) {
 		return o.listener, nil
 	}
 	if o.inMemory {
-		return memconn.Listen("memu", strconv.FormatInt(rand.Int63(), 16))
+		var suffix [8]byte
+		if _, err := rand.Read(suffix[:]); err != nil {
+			return nil, fmt.Errorf("generating listener name: %w", err)
+		}
+		return memconn.Listen("memu", hex.EncodeToString(suffix[:]))
 	}
 	if o.addr != "" {
 		return net.Listen("tcp", o.addr)

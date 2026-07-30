@@ -71,7 +71,7 @@ func (p *PersistentStorage) Save() error {
 		return fmt.Errorf("failed to marshal storage data: %w", err)
 	}
 
-	if err := os.WriteFile(p.filePath, data, 0o644); err != nil {
+	if err := os.WriteFile(p.filePath, data, 0o600); err != nil {
 		return fmt.Errorf("failed to write storage file: %w", err)
 	}
 
