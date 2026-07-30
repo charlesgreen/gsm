@@ -1,0 +1,3 @@
+./auth.go
+./cors.go
+./logging.go
