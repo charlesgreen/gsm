@@ -36,7 +36,7 @@ func main() {
 			log.Fatalf("Failed to create persistent storage: %v", err)
 		}
 		store = persistentStore
-		
+
 		if err := persistentStore.Load(); err != nil {
 			log.Printf("Warning: Failed to load existing storage: %v", err)
 		}
@@ -61,7 +61,7 @@ func main() {
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
-	
+
 	fmt.Println("Shutting down server...")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
@@ -84,4 +84,3 @@ func getEnvOrDefault(key, defaultValue string) string {
 	}
 	return defaultValue
 }
-

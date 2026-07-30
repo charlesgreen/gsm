@@ -151,7 +151,7 @@ func extractProjectID(path string) string {
 func extractProjectAndSecretID(path string) (string, string) {
 	parts := strings.Split(strings.Trim(path, "/"), "/")
 	var projectID, secretID string
-	
+
 	for i, part := range parts {
 		if part == "projects" && i+1 < len(parts) {
 			projectID = parts[i+1]
@@ -160,14 +160,14 @@ func extractProjectAndSecretID(path string) (string, string) {
 			secretID = parts[i+1]
 		}
 	}
-	
+
 	return projectID, secretID
 }
 
 func extractProjectSecretAndVersionID(path string) (string, string, string) {
 	parts := strings.Split(strings.Trim(path, "/"), "/")
 	var projectID, secretID, versionID string
-	
+
 	for i, part := range parts {
 		if part == "projects" && i+1 < len(parts) {
 			projectID = parts[i+1]
@@ -179,15 +179,14 @@ func extractProjectSecretAndVersionID(path string) (string, string, string) {
 			versionID = parts[i+1]
 		}
 	}
-	
+
 	return projectID, secretID, versionID
 }
 
 func writeErrorResponse(w http.ResponseWriter, statusCode int, message, status string) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
-	
+
 	errorResp := models.NewErrorResponse(statusCode, message, status)
 	_ = json.NewEncoder(w).Encode(errorResp)
 }
-

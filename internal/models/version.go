@@ -7,12 +7,12 @@ import (
 
 // SecretVersion represents a version of a secret with its data and metadata.
 type SecretVersion struct {
-	Name        string                `json:"name"`
-	CreateTime  time.Time             `json:"createTime"`
-	State       SecretVersionState    `json:"state"`
-	Etag        string                `json:"etag"`
-	Data        []byte                `json:"-"`
-	Checksum    *SecretVersionChecksum `json:"checksum,omitempty"`
+	Name       string                 `json:"name"`
+	CreateTime time.Time              `json:"createTime"`
+	State      SecretVersionState     `json:"state"`
+	Etag       string                 `json:"etag"`
+	Data       []byte                 `json:"-"`
+	Checksum   *SecretVersionChecksum `json:"checksum,omitempty"`
 }
 
 // SecretVersionState represents the state of a secret version.
@@ -20,9 +20,9 @@ type SecretVersionState string
 
 const (
 	// StateEnabled indicates the version is enabled and accessible.
-	StateEnabled   SecretVersionState = "ENABLED"
+	StateEnabled SecretVersionState = "ENABLED"
 	// StateDisabled indicates the version is disabled and cannot be accessed.
-	StateDisabled  SecretVersionState = "DISABLED"
+	StateDisabled SecretVersionState = "DISABLED"
 	// StateDestroyed indicates the version has been permanently destroyed.
 	StateDestroyed SecretVersionState = "DESTROYED"
 )
@@ -35,20 +35,20 @@ type SecretVersionChecksum struct {
 
 // AccessSecretVersionResponse represents the response for accessing a secret version.
 type AccessSecretVersionResponse struct {
-	Name     string                     `json:"name"`
-	Payload  *SecretPayload             `json:"payload"`
+	Name    string         `json:"name"`
+	Payload *SecretPayload `json:"payload"`
 }
 
 // SecretPayload contains the actual secret data and its checksums.
 type SecretPayload struct {
-	Data     []byte                     `json:"data"`
-	Checksum *SecretVersionChecksum     `json:"checksum,omitempty"`
+	Data     []byte                 `json:"data"`
+	Checksum *SecretVersionChecksum `json:"checksum,omitempty"`
 }
 
 // NewSecretVersion creates a new secret version with the given parameters and data.
 func NewSecretVersion(projectID, secretID string, versionID string, data []byte) *SecretVersion {
 	name := fmt.Sprintf("projects/%s/secrets/%s/versions/%s", projectID, secretID, versionID)
-	
+
 	return &SecretVersion{
 		Name:       name,
 		CreateTime: time.Now().UTC(),

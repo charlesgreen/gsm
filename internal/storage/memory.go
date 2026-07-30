@@ -59,7 +59,7 @@ func (m *MemoryStorage) ListSecrets(_ context.Context, projectID string, pageSiz
 
 	var secrets []*models.Secret
 	prefix := projectID + "/"
-	
+
 	for key, secret := range m.secrets {
 		if strings.HasPrefix(key, prefix) {
 			secrets = append(secrets, secret)
@@ -88,7 +88,7 @@ func (m *MemoryStorage) ListSecrets(_ context.Context, projectID string, pageSiz
 	}
 
 	result := secrets[start:end]
-	
+
 	var nextPageToken string
 	if end < len(secrets) {
 		nextPageToken = strconv.Itoa(end)
@@ -124,7 +124,7 @@ func (m *MemoryStorage) AddSecretVersion(_ context.Context, projectID, secretID 
 
 	secret.VersionCount++
 	versionID := strconv.Itoa(secret.VersionCount)
-	
+
 	version := models.NewSecretVersion(projectID, secretID, versionID, data)
 	secret.Versions[versionID] = version
 
@@ -176,10 +176,10 @@ func (m *MemoryStorage) ListSecretVersions(_ context.Context, projectID, secretI
 	sort.Slice(versions, func(i, j int) bool {
 		iVersion := versions[i].GetVersionID()
 		jVersion := versions[j].GetVersionID()
-		
+
 		iNum, iErr := strconv.Atoi(iVersion)
 		jNum, jErr := strconv.Atoi(jVersion)
-		
+
 		if iErr == nil && jErr == nil {
 			return iNum > jNum // Latest first
 		}
@@ -204,7 +204,7 @@ func (m *MemoryStorage) ListSecretVersions(_ context.Context, projectID, secretI
 	}
 
 	result := versions[start:end]
-	
+
 	var nextPageToken string
 	if end < len(versions) {
 		nextPageToken = strconv.Itoa(end)

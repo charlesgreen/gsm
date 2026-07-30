@@ -13,3 +13,7 @@ linters:
     - staticcheck
     - unused
     - whitespace
+
+formatters:
+  enable:
+    - gofmt

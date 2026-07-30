@@ -24,7 +24,7 @@ func ExampleUsage() {
 	defer func() { _ = client.Close() }()
 
 	projectID := getProjectID()
-	
+
 	fmt.Println("=== Google Secret Manager Emulator Example ===")
 
 	if err := createSecretExample(ctx, client, projectID); err != nil {
@@ -73,7 +73,7 @@ func getProjectID() string {
 
 func createSecretExample(ctx context.Context, client *secretmanager.Client, projectID string) error {
 	fmt.Println("\n--- Creating Secret ---")
-	
+
 	req := &secretmanagerpb.CreateSecretRequest{
 		Parent:   fmt.Sprintf("projects/%s", projectID),
 		SecretId: "example-secret",
@@ -101,9 +101,9 @@ func createSecretExample(ctx context.Context, client *secretmanager.Client, proj
 
 func addVersionExample(ctx context.Context, client *secretmanager.Client, projectID string) error {
 	fmt.Println("\n--- Adding Secret Version ---")
-	
+
 	secretData := "my-super-secret-value"
-	
+
 	req := &secretmanagerpb.AddSecretVersionRequest{
 		Parent: fmt.Sprintf("projects/%s/secrets/example-secret", projectID),
 		Payload: &secretmanagerpb.SecretPayload{
@@ -122,7 +122,7 @@ func addVersionExample(ctx context.Context, client *secretmanager.Client, projec
 
 func accessSecretExample(ctx context.Context, client *secretmanager.Client, projectID string) error {
 	fmt.Println("\n--- Accessing Secret ---")
-	
+
 	req := &secretmanagerpb.AccessSecretVersionRequest{
 		Name: fmt.Sprintf("projects/%s/secrets/example-secret/versions/latest", projectID),
 	}
@@ -141,7 +141,7 @@ func accessSecretExample(ctx context.Context, client *secretmanager.Client, proj
 
 func listSecretsExample(ctx context.Context, client *secretmanager.Client, projectID string) error {
 	fmt.Println("\n--- Listing Secrets ---")
-	
+
 	req := &secretmanagerpb.ListSecretsRequest{
 		Parent: fmt.Sprintf("projects/%s", projectID),
 	}
@@ -162,13 +162,13 @@ func listSecretsExample(ctx context.Context, client *secretmanager.Client, proje
 			fmt.Printf("  Labels: %v\n", secret.Labels)
 		}
 	}
-	
+
 	return nil
 }
 
 func listVersionsExample(ctx context.Context, client *secretmanager.Client, projectID string) error {
 	fmt.Println("\n--- Listing Secret Versions ---")
-	
+
 	req := &secretmanagerpb.ListSecretVersionsRequest{
 		Parent: fmt.Sprintf("projects/%s/secrets/example-secret", projectID),
 	}
@@ -187,19 +187,19 @@ func listVersionsExample(ctx context.Context, client *secretmanager.Client, proj
 		fmt.Printf("  State: %s\n", version.State.String())
 		fmt.Printf("  Created: %v\n", version.CreateTime.AsTime())
 	}
-	
+
 	return nil
 }
 
 // SimpleExample shows basic secret creation and access with minimal setup.
 func SimpleExample() {
 	fmt.Println("=== Simple Secret Manager Example ===")
-	
+
 	ctx := context.Background()
 	projectID := "my-project"
-	
+
 	_ = os.Setenv("SECRET_MANAGER_EMULATOR_HOST", "localhost:8085")
-	
+
 	client, err := secretmanager.NewClient(ctx,
 		option.WithEndpoint("http://localhost:8085"),
 		option.WithoutAuthentication(),
@@ -210,7 +210,7 @@ func SimpleExample() {
 	defer func() { _ = client.Close() }()
 
 	secretName := fmt.Sprintf("projects/%s/secrets/my-secret", projectID)
-	
+
 	_, err = client.CreateSecret(ctx, &secretmanagerpb.CreateSecretRequest{
 		Parent:   fmt.Sprintf("projects/%s", projectID),
 		SecretId: "my-secret",
@@ -251,10 +251,10 @@ func SimpleExample() {
 // Base64Example demonstrates working with base64-encoded secret data like credentials.
 func Base64Example() {
 	fmt.Println("=== Base64 Encoded Secret Example ===")
-	
+
 	ctx := context.Background()
 	_ = os.Setenv("SECRET_MANAGER_EMULATOR_HOST", "localhost:8085")
-	
+
 	client, err := secretmanager.NewClient(ctx,
 		option.WithEndpoint("http://localhost:8085"),
 		option.WithoutAuthentication(),
@@ -269,14 +269,14 @@ func Base64Example() {
 		"password": "super-secret-password",
 		"api_key":  "abcd1234567890",
 	}
-	
-	jsonData := fmt.Sprintf(`{"username":"%s","password":"%s","api_key":"%s"}`, 
+
+	jsonData := fmt.Sprintf(`{"username":"%s","password":"%s","api_key":"%s"}`,
 		secretData["username"], secretData["password"], secretData["api_key"])
-	
+
 	encodedData := base64.StdEncoding.EncodeToString([]byte(jsonData))
-	
+
 	projectID := "my-project"
-	
+
 	_, err = client.CreateSecret(ctx, &secretmanagerpb.CreateSecretRequest{
 		Parent:   fmt.Sprintf("projects/%s", projectID),
 		SecretId: "database-credentials",
@@ -297,7 +297,7 @@ func Base64Example() {
 	}
 
 	decodedData, _ := base64.StdEncoding.DecodeString(encodedData)
-	
+
 	_, err = client.AddSecretVersion(ctx, &secretmanagerpb.AddSecretVersionRequest{
 		Parent: fmt.Sprintf("projects/%s/secrets/database-credentials", projectID),
 		Payload: &secretmanagerpb.SecretPayload{
