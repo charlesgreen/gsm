@@ -106,7 +106,7 @@ func (p *PersistentStorage) AddSecretVersion(ctx context.Context, projectID, sec
 	if err != nil {
 		return nil, err
 	}
-	
+
 	if err := p.Save(); err != nil {
 		p.mu.Lock()
 		key := fmt.Sprintf("%s/%s", projectID, secretID)
@@ -117,7 +117,7 @@ func (p *PersistentStorage) AddSecretVersion(ctx context.Context, projectID, sec
 		p.mu.Unlock()
 		return nil, err
 	}
-	
+
 	return version, nil
 }
 

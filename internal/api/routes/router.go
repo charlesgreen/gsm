@@ -21,7 +21,7 @@ func SetupRoutes(storage storage.Storage) *http.ServeMux {
 
 	enableAuth := os.Getenv("GSM_ENABLE_AUTH") == "true"
 	enableCORS := os.Getenv("GSM_ENABLE_CORS") != "false"
-	
+
 	var authMiddleware func(http.Handler) http.Handler
 	if enableAuth {
 		authMiddleware = middleware.MockAuth
@@ -48,28 +48,28 @@ func SetupRoutes(storage storage.Storage) *http.ServeMux {
 		switch {
 		case r.Method == http.MethodPost && matchesPattern(r.URL.Path, "/v1/projects/*/secrets"):
 			applyAuthMiddleware(http.HandlerFunc(secretsHandler.CreateSecret)).ServeHTTP(w, r)
-		
+
 		case r.Method == http.MethodGet && matchesPattern(r.URL.Path, "/v1/projects/*/secrets"):
 			applyAuthMiddleware(http.HandlerFunc(secretsHandler.ListSecrets)).ServeHTTP(w, r)
-		
+
 		case r.Method == http.MethodGet && matchesPattern(r.URL.Path, "/v1/projects/*/secrets/*") && !containsVersions(r.URL.Path):
 			applyAuthMiddleware(http.HandlerFunc(secretsHandler.GetSecret)).ServeHTTP(w, r)
-		
+
 		case r.Method == http.MethodDelete && matchesPattern(r.URL.Path, "/v1/projects/*/secrets/*") && !containsVersions(r.URL.Path):
 			applyAuthMiddleware(http.HandlerFunc(secretsHandler.DeleteSecret)).ServeHTTP(w, r)
-		
+
 		case r.Method == http.MethodPost && strings.HasSuffix(r.URL.Path, ":addVersion") && matchesPattern(strings.TrimSuffix(r.URL.Path, ":addVersion"), "/v1/projects/*/secrets/*"):
 			applyAuthMiddleware(http.HandlerFunc(versionsHandler.AddSecretVersion)).ServeHTTP(w, r)
-		
+
 		case r.Method == http.MethodGet && strings.HasSuffix(r.URL.Path, ":access") && matchesPattern(strings.TrimSuffix(r.URL.Path, ":access"), "/v1/projects/*/secrets/*/versions/*"):
 			applyAuthMiddleware(http.HandlerFunc(versionsHandler.AccessSecretVersion)).ServeHTTP(w, r)
-		
+
 		case r.Method == http.MethodGet && matchesPattern(r.URL.Path, "/v1/projects/*/secrets/*/versions"):
 			applyAuthMiddleware(http.HandlerFunc(versionsHandler.ListSecretVersions)).ServeHTTP(w, r)
-		
+
 		case r.Method == http.MethodDelete && matchesPattern(r.URL.Path, "/v1/projects/*/secrets/*/versions/*") && !containsAccess(r.URL.Path):
 			applyAuthMiddleware(http.HandlerFunc(versionsHandler.DeleteSecretVersion)).ServeHTTP(w, r)
-		
+
 		default:
 			applyMiddleware(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 				w.Header().Set("Content-Type", "application/json")
@@ -89,11 +89,11 @@ func matchesPattern(path, pattern string) bool {
 func pathMatches(path, pattern string) bool {
 	pathParts := splitPath(path)
 	patternParts := splitPath(pattern)
-	
+
 	if len(pathParts) != len(patternParts) {
 		return false
 	}
-	
+
 	for i, patternPart := range patternParts {
 		if patternPart == "*" {
 			continue
@@ -102,14 +102,14 @@ func pathMatches(path, pattern string) bool {
 			return false
 		}
 	}
-	
+
 	return true
 }
 
 func splitPath(path string) []string {
 	parts := []string{}
 	current := ""
-	
+
 	for _, char := range path {
 		if char == '/' {
 			if current != "" {
@@ -120,11 +120,11 @@ func splitPath(path string) []string {
 			current += string(char)
 		}
 	}
-	
+
 	if current != "" {
 		parts = append(parts, current)
 	}
-	
+
 	return parts
 }
 

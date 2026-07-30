@@ -30,9 +30,9 @@ func TestGSMEmulatorProductionParity(t *testing.T) {
 		setup          func() // Optional setup function
 	}{
 		{
-			name:           "CreateSecret_Success",
-			method:         "POST",
-			path:           "/v1/projects/test-project/secrets",
+			name:   "CreateSecret_Success",
+			method: "POST",
+			path:   "/v1/projects/test-project/secrets",
 			body: map[string]interface{}{
 				"secretId": "test-secret-1",
 				"secret": map[string]interface{}{
@@ -45,9 +45,9 @@ func TestGSMEmulatorProductionParity(t *testing.T) {
 			description:    "Creating new secret should return 201",
 		},
 		{
-			name:           "CreateSecret_AlreadyExists",
-			method:         "POST",
-			path:           "/v1/projects/test-project/secrets",
+			name:   "CreateSecret_AlreadyExists",
+			method: "POST",
+			path:   "/v1/projects/test-project/secrets",
 			body: map[string]interface{}{
 				"secretId": "test-secret-1", // Same as above
 				"secret": map[string]interface{}{
@@ -131,9 +131,9 @@ func TestGSMEmulatorProductionParity(t *testing.T) {
 			description: "Invalid request body should return 400",
 		},
 		{
-			name:           "CreateSecret_MissingSecretId",
-			method:         "POST",
-			path:           "/v1/projects/test-project/secrets",
+			name:   "CreateSecret_MissingSecretId",
+			method: "POST",
+			path:   "/v1/projects/test-project/secrets",
 			body: map[string]interface{}{
 				"secret": map[string]interface{}{},
 			},
@@ -157,7 +157,7 @@ func TestGSMEmulatorProductionParity(t *testing.T) {
 
 			var body []byte
 			var err error
-			
+
 			if tt.body != nil {
 				if bodyStr, ok := tt.body.(string); ok {
 					body = []byte(bodyStr)
@@ -171,7 +171,7 @@ func TestGSMEmulatorProductionParity(t *testing.T) {
 
 			req := httptest.NewRequest(tt.method, tt.path, bytes.NewReader(body))
 			req.Header.Set("Content-Type", "application/json")
-			
+
 			w := httptest.NewRecorder()
 			router.ServeHTTP(w, req)
 
@@ -192,7 +192,7 @@ func TestGSMEmulatorProductionParity(t *testing.T) {
 				}
 
 				if errorResp.Error.Code != tt.expectedError.Error.Code {
-					t.Errorf("Expected error code %d, got %d", 
+					t.Errorf("Expected error code %d, got %d",
 						tt.expectedError.Error.Code, errorResp.Error.Code)
 				}
 
@@ -319,7 +319,7 @@ func TestSecretVersionErrorFormat(t *testing.T) {
 			}
 
 			if errorResp.Error.Message != tt.expectedMessage {
-				t.Errorf("Expected message '%s', got '%s'", 
+				t.Errorf("Expected message '%s', got '%s'",
 					tt.expectedMessage, errorResp.Error.Message)
 			}
 		})
@@ -330,7 +330,7 @@ func TestSecretVersionErrorFormat(t *testing.T) {
 func TestProductionParityIntegration(t *testing.T) {
 	storage := storage.NewMemoryStorage()
 	router := routes.SetupRoutes(storage)
-	
+
 	// Create a test server
 	server := httptest.NewServer(router)
 	defer server.Close()
@@ -372,7 +372,7 @@ func TestProductionParityIntegration(t *testing.T) {
 		},
 		{
 			name:           "AccessSecret_Success",
-			operation:      "access", 
+			operation:      "access",
 			secretName:     "test-secret-1",
 			expectedStatus: 200,
 			shouldMatch:    true,

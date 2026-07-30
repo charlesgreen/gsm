@@ -7,18 +7,18 @@ import (
 
 // Secret represents a Google Secret Manager secret resource.
 type Secret struct {
-	Name         string            `json:"name"`
-	CreateTime   time.Time         `json:"createTime"`
-	Labels       map[string]string `json:"labels,omitempty"`
-	Replication  Replication       `json:"replication"`
-	Etag         string            `json:"etag"`
+	Name         string                    `json:"name"`
+	CreateTime   time.Time                 `json:"createTime"`
+	Labels       map[string]string         `json:"labels,omitempty"`
+	Replication  Replication               `json:"replication"`
+	Etag         string                    `json:"etag"`
 	Versions     map[string]*SecretVersion `json:"-"`
-	VersionCount int               `json:"-"`
+	VersionCount int                       `json:"-"`
 }
 
 // Replication describes the replication policy for a secret.
 type Replication struct {
-	Automatic *AutomaticReplication `json:"automatic,omitempty"`
+	Automatic   *AutomaticReplication   `json:"automatic,omitempty"`
 	UserManaged *UserManagedReplication `json:"userManaged,omitempty"`
 }
 
@@ -46,7 +46,7 @@ type CustomerManagedEncryption struct {
 // NewSecret creates a new secret with the given project ID, secret ID, and labels.
 func NewSecret(projectID, secretID string, labels map[string]string) *Secret {
 	name := fmt.Sprintf("projects/%s/secrets/%s", projectID, secretID)
-	
+
 	return &Secret{
 		Name:       name,
 		CreateTime: time.Now().UTC(),
@@ -74,7 +74,7 @@ func extractProjectID(name string) string {
 	if len(name) < 10 || name[:9] != "projects/" {
 		return ""
 	}
-	
+
 	end := len("projects/")
 	for i := end; i < len(name); i++ {
 		if name[i] == '/' {

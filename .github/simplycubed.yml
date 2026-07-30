@@ -2,10 +2,13 @@
 # https://github.com/simplycubed/code
 #
 # The gate is the command SimplyCubed Code must pass before it proposes a change.
-# It mirrors the checks gsm's CI actually enforces (vet, golangci-lint, build,
-# tests) as a subset that runs on one machine. The environmental checks in CI
-# (multi-version build matrix, Docker image, integration tests that need a running
-# emulator) are left to gsm's own CI, which runs after a human merges.
+# It runs the checks gsm's CI enforces that are runnable on one machine: go vet,
+# golangci-lint (which now also enforces gofmt formatting), a build, and the full
+# test suite (the integration tests are self-contained via httptest, so they run
+# here too). Only the genuinely environmental parts of CI stay CI-only: the
+# multi-version build matrix, the Docker image build, and the Google Cloud client
+# smoke that needs a running emulator. Those run in gsm's own CI after a human
+# merges.
 labelPrefix: sc
 
-gate: go vet ./... && golangci-lint run ./... && go build ./... && go test ./tests/unit/...
+gate: go vet ./... && golangci-lint run ./... && go build ./... && go test ./...
