@@ -184,7 +184,11 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
+        # --target pins the tag to the commit this run built. Without it the
+        # tag lands on whatever main points to when this step runs, so a slow
+        # run tags a newer commit than the binaries it is attaching.
         gh release create v${{ github.run_number }} \
+          --target ${{ github.sha }} \
           --title "Release v${{ github.run_number }}" \
           --notes "Automated release for build #${{ github.run_number }}" \
           bin/gsm-server-*
